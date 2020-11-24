@@ -18,7 +18,6 @@
  */
 
 
-#include "includes.h"
 
 #include <sys/types.h>
 #include <sys/ioctl.h>
@@ -32,9 +31,7 @@
 #ifdef HAVE_LIBGEN_H
 # include <libgen.h>
 #endif
-#ifdef HAVE_POLL_H
 #include <poll.h>
-#endif
 #include <signal.h>
 #include <stdarg.h>
 #include <stdio.h>
@@ -53,10 +50,8 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <netdb.h>
-#ifdef HAVE_PATHS_H
 # include <paths.h>
 #include <pwd.h>
-#endif
 #ifdef SSH_TUN_OPENBSD
 #include <net/if.h>
 #endif
@@ -64,10 +59,37 @@
 #include "xmalloc.h"
 #include "misc.h"
 #include "log.h"
-#include "ssh.h"
+// #include "ssh.h"
 #include "sshbuf.h"
 #include "ssherr.h"
-#include "platform.h"
+// #include "platform.h"
+#define _PATH_DEVNULL "/dev/null"
+#define SSH_DEFAULT_PORT 22
+
+#ifndef TIMEVAL_TO_TIMESPEC
+#define TIMEVAL_TO_TIMESPEC(tv, ts) {                                   \
+        (ts)->tv_sec = (tv)->tv_sec;                                    \
+        (ts)->tv_nsec = (tv)->tv_usec * 1000;                           \
+}
+#endif
+
+
+/*
+ * return 1 if the specified uid is a uid that may own a system directory
+ * otherwise 0.
+ */
+int
+platform_sys_dir_uid(uid_t uid)
+{
+        if (uid == 0)
+                return 1;
+#ifdef PLATFORM_SYS_DIR_UID
+        if (uid == PLATFORM_SYS_DIR_UID)
+                return 1;
+#endif
+        return 0;
+}
+
 
 /* remove newline at end of string */
 char *
@@ -1673,39 +1695,6 @@ mktemp_proto(char *s, size_t len)
 		fatal_f("template string too short");
 }
 
-static const struct {
-	const char *name;
-	int value;
-} ipqos[] = {
-	{ "none", INT_MAX },		/* can't use 0 here; that's CS0 */
-	{ "af11", IPTOS_DSCP_AF11 },
-	{ "af12", IPTOS_DSCP_AF12 },
-	{ "af13", IPTOS_DSCP_AF13 },
-	{ "af21", IPTOS_DSCP_AF21 },
-	{ "af22", IPTOS_DSCP_AF22 },
-	{ "af23", IPTOS_DSCP_AF23 },
-	{ "af31", IPTOS_DSCP_AF31 },
-	{ "af32", IPTOS_DSCP_AF32 },
-	{ "af33", IPTOS_DSCP_AF33 },
-	{ "af41", IPTOS_DSCP_AF41 },
-	{ "af42", IPTOS_DSCP_AF42 },
-	{ "af43", IPTOS_DSCP_AF43 },
-	{ "cs0", IPTOS_DSCP_CS0 },
-	{ "cs1", IPTOS_DSCP_CS1 },
-	{ "cs2", IPTOS_DSCP_CS2 },
-	{ "cs3", IPTOS_DSCP_CS3 },
-	{ "cs4", IPTOS_DSCP_CS4 },
-	{ "cs5", IPTOS_DSCP_CS5 },
-	{ "cs6", IPTOS_DSCP_CS6 },
-	{ "cs7", IPTOS_DSCP_CS7 },
-	{ "ef", IPTOS_DSCP_EF },
-	{ "le", IPTOS_DSCP_LE },
-	{ "lowdelay", IPTOS_LOWDELAY },
-	{ "throughput", IPTOS_THROUGHPUT },
-	{ "reliability", IPTOS_RELIABILITY },
-	{ NULL, -1 }
-};
-
 int
 parse_ipqos(const char *cp)
 {
@@ -1713,17 +1702,10 @@ parse_ipqos(const char *cp)
 	char *ep;
 	long val;
 
+
 	if (cp == NULL)
 		return -1;
-	for (i = 0; ipqos[i].name != NULL; i++) {
-		if (strcasecmp(cp, ipqos[i].name) == 0)
-			return ipqos[i].value;
-	}
-	/* Try parsing as an integer */
-	val = strtol(cp, &ep, 0);
-	if (*cp == '\0' || *ep != '\0' || val < 0 || val > 255)
-		return -1;
-	return val;
+	return 0;
 }
 
 const char *
@@ -1732,11 +1714,6 @@ iptos2str(int iptos)
 	int i;
 	static char iptos_str[sizeof "0xff"];
 
-	for (i = 0; ipqos[i].name != NULL; i++) {
-		if (ipqos[i].value == iptos)
-			return ipqos[i].name;
-	}
-	snprintf(iptos_str, sizeof iptos_str, "0x%02x", iptos);
 	return iptos_str;
 }
 
@@ -1845,6 +1822,8 @@ int
 daemonized(void)
 {
 	int fd;
+	return 0;
+#ifdef XX	
 
 	if ((fd = open(_PATH_TTY, O_RDONLY | O_NOCTTY)) >= 0) {
 		close(fd);
@@ -1855,6 +1834,7 @@ daemonized(void)
 	if (getsid(0) != getpid())
 		return 0;	/* not session leader */
 	debug3("already daemonized");
+#endif
 	return 1;
 }
 
@@ -2404,6 +2384,7 @@ ssh_signal(int signum, sshsig_t handler)
 	}
 	return osa.sa_handler;
 }
+
 
 int
 stdfd_devnull(int do_stdin, int do_stdout, int do_stderr)

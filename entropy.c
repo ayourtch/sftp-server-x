@@ -22,9 +22,8 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "includes.h"
-
 #define RANDOM_SEED_SIZE 48
+
 
 #ifdef WITH_OPENSSL
 
@@ -243,7 +242,7 @@ seed_rng(void)
 		fatal("PRNG is not seeded");
 
 	/* Ensure arc4random() is primed */
-	arc4random_buf(buf, sizeof(buf));
+	// arc4random_buf(buf, sizeof(buf));
 	explicit_bzero(buf, sizeof(buf));
 }
 
@@ -259,7 +258,7 @@ seed_rng(void)
 	unsigned char buf[RANDOM_SEED_SIZE];
 
 	/* Ensure arc4random() is primed */
-	arc4random_buf(buf, sizeof(buf));
+	// arc4random_buf(buf, sizeof(buf));
 	explicit_bzero(buf, sizeof(buf));
 }
 

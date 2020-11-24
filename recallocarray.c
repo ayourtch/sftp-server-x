@@ -17,14 +17,11 @@
 
 /* OPENBSD ORIGINAL: lib/libc/stdlib/recallocarray.c */
 
-#include "includes.h"
 #ifndef HAVE_RECALLOCARRAY
 
 #include <errno.h>
 #include <stdlib.h>
-#ifdef HAVE_STDINT_H
 #include <stdint.h>
-#endif
 #include <string.h>
 #include <unistd.h>
 

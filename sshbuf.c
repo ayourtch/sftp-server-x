@@ -16,11 +16,11 @@
  */
 
 #define SSHBUF_INTERNAL
-#include "includes.h"
 
 #include <sys/types.h>
 #include <signal.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -32,7 +32,7 @@ static inline int
 sshbuf_check_sanity(const struct sshbuf *buf)
 {
 	SSHBUF_TELL("sanity");
-	if (__predict_false(buf == NULL ||
+	if ((buf == NULL ||
 	    (!buf->readonly && buf->d != buf->cd) ||
 	    buf->refcount < 1 || buf->refcount > SSHBUF_REFS_MAX ||
 	    buf->cd == NULL ||

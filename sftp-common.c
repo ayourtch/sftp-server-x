@@ -24,10 +24,11 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "includes.h"
 
 #include <sys/types.h>
 #include <sys/stat.h>
+
+#include <stdint.h>
 
 #include <grp.h>
 #include <pwd.h>
@@ -218,7 +219,7 @@ ls_file(const char *name, const struct stat *st, int remote, int si_units)
 	struct tm *ltime = localtime(&st->st_mtime);
 	const char *user, *group;
 	char buf[1024], lc[8], mode[11+1], tbuf[12+1], ubuf[11+1], gbuf[11+1];
-	char sbuf[FMT_SCALED_STRSIZE];
+	char sbuf[32];
 	time_t now;
 
 	strmode(st->st_mode, mode);
@@ -246,10 +247,16 @@ ls_file(const char *name, const struct stat *st, int remote, int si_units)
 	ulen = MAXIMUM(strlen(user), 8);
 	glen = MAXIMUM(strlen(group), 8);
 	if (si_units) {
+		/*
 		fmt_scaled((long long)st->st_size, sbuf);
 		snprintf(buf, sizeof buf, "%s %3s %-*s %-*s %8s %s %s",
 		    mode, lc, ulen, user, glen, group,
 		    sbuf, tbuf, name);
+		    */
+		
+		snprintf(buf, sizeof buf, "%s %3s %-*s %-*s %8llu %s %s",
+		    mode, lc, ulen, user, glen, group,
+		    (unsigned long long)st->st_size, tbuf, name);
 	} else {
 		snprintf(buf, sizeof buf, "%s %3s %-*s %-*s %8llu %s %s",
 		    mode, lc, ulen, user, glen, group,

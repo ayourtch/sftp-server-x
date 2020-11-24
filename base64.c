@@ -44,8 +44,6 @@
 
 /* OPENBSD ORIGINAL: lib/libc/net/base64.c */
 
-#include "includes.h"
-
 #if (!defined(HAVE_B64_NTOP) && !defined(HAVE___B64_NTOP)) || (!defined(HAVE_B64_PTON) && !defined(HAVE___B64_PTON))
 
 #include <sys/types.h>

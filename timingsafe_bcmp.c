@@ -17,8 +17,10 @@
 
 /* OPENBSD ORIGINAL: lib/libc/string/timingsafe_bcmp.c */
 
-#include "includes.h"
 #ifndef HAVE_TIMINGSAFE_BCMP
+
+#include <stdlib.h>
+
 
 int
 timingsafe_bcmp(const void *b1, const void *b2, size_t n)

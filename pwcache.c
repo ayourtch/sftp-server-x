@@ -30,8 +30,6 @@
 
 /* OPENBSD ORIGINAL: lib/libc/gen/pwcache.c */
 
-#include "includes.h"
-
 #include <sys/types.h>
 
 #include <grp.h>

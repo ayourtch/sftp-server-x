@@ -43,8 +43,6 @@
 #ifndef _BSD_BASE64_H
 #define _BSD_BASE64_H
 
-#include "includes.h"
-
 #ifndef HAVE___B64_NTOP
 # ifndef HAVE_B64_NTOP
 int b64_ntop(u_char const *src, size_t srclength, char *target,

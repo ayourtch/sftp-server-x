@@ -15,25 +15,25 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#include "includes.h"
 
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <errno.h>
 #include <stdlib.h>
-#ifdef HAVE_STDINT_H
 # include <stdint.h>
-#endif
 #include <stdio.h>
 #include <limits.h>
 #include <string.h>
-#include <resolv.h>
+// #include <resolv.h>
 #include <ctype.h>
+
+#include "base64.h"
 
 #include "ssherr.h"
 #define SSHBUF_INTERNAL
 #include "sshbuf.h"
+
 
 void
 sshbuf_dump_data(const void *s, size_t len, FILE *f)

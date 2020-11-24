@@ -16,7 +16,6 @@
  */
 
 #define SSHBUF_INTERNAL
-#include "includes.h"
 
 #include <sys/types.h>
 
@@ -24,12 +23,13 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#ifdef HAVE_STDINT_H
 # include <stdint.h>
-#endif
 
 #include "ssherr.h"
 #include "sshbuf.h"
+
+#define VA_COPY(dest, src) memcpy(&(dest), &(src), sizeof((dest)))
+
 
 int
 sshbuf_get(struct sshbuf *buf, void *v, size_t len)

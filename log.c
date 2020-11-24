@@ -34,7 +34,6 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "includes.h"
 
 #include <sys/types.h>
 
@@ -46,12 +45,8 @@
 #include <syslog.h>
 #include <unistd.h>
 #include <errno.h>
-#if defined(HAVE_STRNVIS) && defined(HAVE_VIS_H) && !defined(BROKEN_STRNVIS)
-# include <vis.h>
-#endif
 
 #include "log.h"
-#include "match.h"
 
 static LogLevel log_level = SYSLOG_LEVEL_INFO;
 static int log_on_stderr = 1;
@@ -65,8 +60,6 @@ static size_t nlog_verbose;
 
 extern char *__progname;
 
-#define LOG_SYSLOG_VIS	(VIS_CSTYLE|VIS_NL|VIS_TAB|VIS_OCTAL)
-#define LOG_STDERR_VIS	(VIS_SAFE|VIS_OCTAL)
 
 /* textual representation of log-facilities/levels */
 
@@ -393,8 +386,7 @@ do_log(const char *file, const char *func, int line, LogLevel level,
 		snprintf(fmtbuf, sizeof(fmtbuf), "%s: %s", msgbuf, suffix);
 		strlcpy(msgbuf, fmtbuf, sizeof(msgbuf));
 	}
-	strnvis(fmtbuf, msgbuf, sizeof(fmtbuf),
-	    log_on_stderr ? LOG_STDERR_VIS : LOG_SYSLOG_VIS);
+	strncpy(fmtbuf, msgbuf, sizeof(fmtbuf));
 	if (log_handler != NULL) {
 		/* Avoid recursion */
 		tmp_handler = log_handler;
@@ -467,12 +459,14 @@ sshlogv(const char *file, const char *func, int line, int showfunc,
 
 	snprintf(tag, sizeof(tag), "%.48s:%.48s():%d",
 	    (cp = strrchr(file, '/')) == NULL ? file : cp + 1, func, line);
+	/*
 	for (i = 0; i < nlog_verbose; i++) {
 		if (match_pattern_list(tag, log_verbose[i], 0) == 1) {
 			forced = 1;
 			break;
 		}
 	}
+	*/
 
 	if (log_handler == NULL && forced)
 		snprintf(fmt2, sizeof(fmt2), "%s: %s", tag, fmt);

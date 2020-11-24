@@ -30,7 +30,6 @@
 
 /* OPENBSD ORIGINAL: lib/libc/string/strmode.c */
 
-#include "includes.h"
 #ifndef HAVE_STRMODE
 
 #include <sys/types.h>

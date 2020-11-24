@@ -15,7 +15,6 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#include "includes.h"
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -25,9 +24,14 @@
 #ifdef HAVE_SYS_MOUNT_H
 #include <sys/mount.h>
 #endif
-#ifdef HAVE_SYS_STATVFS_H
+// #ifdef HAVE_SYS_STATVFS_H
 #include <sys/statvfs.h>
-#endif
+#include <stdint.h>
+// #endif
+//
+# define howmany(x,y)   (((x)+((y)-1))/(y))
+# define FSID_TO_ULONG(f) ((f))
+
 
 #include <dirent.h>
 #include <errno.h>
@@ -45,8 +49,8 @@
 #include "ssherr.h"
 #include "log.h"
 #include "misc.h"
-#include "match.h"
-#include "uidswap.h"
+// #include "match.h"
+// #include "uidswap.h"
 
 #include "sftp.h"
 #include "sftp-common.h"
@@ -164,6 +168,7 @@ request_permitted(const struct sftp_handler *h)
 		verbose("Refusing %s request in read-only mode", h->name);
 		return 0;
 	}
+	/*
 	if (request_denylist != NULL &&
 	    ((result = match_list(h->name, request_denylist, NULL))) != NULL) {
 		free(result);
@@ -180,6 +185,7 @@ request_permitted(const struct sftp_handler *h)
 		verbose("Refusing non-allowlisted %s request", h->name);
 		return 0;
 	}
+	*/
 	return 1;
 }
 
@@ -1576,7 +1582,7 @@ sftp_server_main(int argc, char **argv, struct passwd *user_pw)
 	extern char *optarg;
 	extern char *__progname;
 
-	__progname = ssh_get_progname(argv[0]);
+	__progname = argv[0];
 	log_init(__progname, log_level, log_facility, log_stderr);
 
 	pw = pwcopy(user_pw);
@@ -1659,9 +1665,6 @@ sftp_server_main(int argc, char **argv, struct passwd *user_pw)
 	 * restricted configurations.
 	 */
 	platform_disable_tracing(1);	/* strict */
-
-	/* Drop any fine-grained privileges we don't need */
-	platform_pledge_sftp_server();
 
 	if ((cp = getenv("SSH_CONNECTION")) != NULL) {
 		client_addr = xstrdup(cp);

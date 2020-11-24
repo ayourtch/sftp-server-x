@@ -15,7 +15,6 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#include "includes.h"
 
 #include <sys/types.h>
 
@@ -26,7 +25,7 @@
 
 /* default implementation */
 void
-cleanup_exit(int i)
+x_cleanup_exit(int i)
 {
 	_exit(i);
 }
