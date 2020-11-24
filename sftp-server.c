@@ -702,10 +702,11 @@ process_open(u_int32_t id)
 	mode = (a.flags & SSH2_FILEXFER_ATTR_PERMISSIONS) ? a.perm : 0666;
 	logit("open \"%s\" flags %s mode 0%o",
 	    name, string_from_portable(pflags), mode);
-	if (readonly &&
+
+	if ((readonly || ( access( name, F_OK ) != -1 )) &&
 	    ((flags & O_ACCMODE) != O_RDONLY ||
 	    (flags & (O_CREAT|O_TRUNC)) != 0)) {
-		verbose("Refusing open request in read-only mode");
+		verbose("Refusing open request because read-only mode or file already exists");
 		status = SSH2_FX_PERMISSION_DENIED;
 	} else {
 		fd = open(name, flags, mode);
